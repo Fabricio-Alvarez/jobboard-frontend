@@ -39,6 +39,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/HistorialOfertas.vue')
   },
   {
+    path: '/historial-empleos',
+    component: () => import('@/views/HistorialEmpleos.vue')
+  },
+  {
     path: '/candidatos/:id',
     component: () => import('@/views/CandidatosOferta.vue')
   }

@@ -23,7 +23,10 @@
             class="autocomplete-input"
             placeholder="Escribe o selecciona una categoría"
           />
-          <div v-if="showCategoriaOptions && filteredCategorias.length" class="autocomplete-list">
+          <div
+            v-if="showCategoriaOptions && filteredCategorias.length"
+            class="autocomplete-list"
+          >
             <div
               class="autocomplete-item"
               v-for="(categoria, index) in filteredCategorias"
@@ -35,6 +38,7 @@
           </div>
         </div>
       </div>
+
       <ion-item class="form-group">
         <ion-label class="icon-label" position="stacked">
           <span class="emoji">📍</span> Lugar
@@ -49,6 +53,13 @@
           <ion-select-option value="Limón">Limón</ion-select-option>
         </ion-select>
       </ion-item>
+
+
+      <div class="ver-empleos-container">
+        <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
+          Ver todos los empleos
+        </button>
+      </div>
 
       <h3 class="subtitle">Últimas Búsquedas</h3>
       <div class="recent-searches">
@@ -69,12 +80,20 @@
           Consejos, guías y recursos para encontrar antes el empleo de tus
           sueños que encaje contigo. Mira para más información
         </p>
-        <img src="@/assets/imagenmujer.png" alt="Desarrollo" class="info-img" />
+        <img
+          src="@/assets/imagenmujer.png"
+          alt="Desarrollo"
+          class="info-img"
+        />
         <p>
           Copyright 2025 - 2025<br />
           Para más información consulte el siguiente enlace
         </p>
-        <button @click="goToSomos" class="btn-somos">Quienes Somos</button>
+ 
+        <div class="info-buttons">
+          <button @click="goToSomos" class="btn-somos">Quienes Somos</button>
+          <button @click="goToDashboard" class="btn-volver">Volver</button>
+        </div>
       </div>
     </div>
     <footer class="footer">
@@ -114,6 +133,15 @@ export default defineComponent({
       router.push('/somos')
     }
 
+    const goToDashboard = () => {
+      router.push('/dashboard-candidatos')
+    }
+
+    const goToHistorialEmpleos = () => {
+      router.push('/historial-empleos')
+    }
+
+    // Lista fija de categorías
     const categorias = [
       'Recepcionista',
       'Contador',
@@ -130,9 +158,10 @@ export default defineComponent({
       'Cocinero',
       'Guardia de seguridad',
       'Profesor de inglés',
-      'Auxiliar de bodega',
+      'Auxiliar de bodega'
     ]
 
+    // Reactive variables para autocompletado
     const categoriaInput = ref('')
     const filteredCategorias = ref<string[]>(categorias)
     const showCategoriaOptions = ref(false)
@@ -150,6 +179,7 @@ export default defineComponent({
     }
 
     const hideCategoriaOptions = () => {
+      // Retardo para que se registre el click antes de ocultar
       setTimeout(() => {
         showCategoriaOptions.value = false
       }, 100)
@@ -158,14 +188,16 @@ export default defineComponent({
     return {
       logout,
       goToSomos,
+      goToDashboard,
+      goToHistorialEmpleos,
       categoriaInput,
       filteredCategorias,
       filterCategorias,
       selectCategoria,
       showCategoriaOptions,
-      hideCategoriaOptions,
+      hideCategoriaOptions
     }
-  },
+  }
 })
 </script>
 
@@ -177,7 +209,7 @@ export default defineComponent({
   font-family: sans-serif;
   overflow-y: auto;
   box-sizing: border-box;
-  min-height: calc(100vh - 60px); 
+  min-height: calc(100vh - 60px);
 }
 
 .top-bar {
@@ -307,7 +339,40 @@ h2 {
   border-top: 1px solid #ddd;
   background-color: #f8f8f8;
 }
+
+
+.ver-empleos-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.btn-ver-empleos {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+
+.info-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-volver {
+  background-color: #ccc;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: black;
+}
 </style>
-
-
-
