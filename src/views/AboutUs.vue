@@ -31,7 +31,7 @@
           <img src="@/assets/imagenequipo.png" alt="Equipo de trabajo" />
         </div>
 
-        <ion-button expand="block" router-link="/home">Volver</ion-button>
+        <ion-button expand="block" router-link="/dashboard-candidatos">Volver</ion-button>
       </div>
     </ion-content>
 

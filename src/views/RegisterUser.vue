@@ -121,7 +121,7 @@ export default defineComponent({
     const validateEmail = (e: string) => /\S+@\S+\.\S+/.test(e)
 
     const handleRegister = async () => {
-      // Validaciones en el cliente
+    
       if (
         !email.value ||
         !password.value ||
@@ -148,7 +148,6 @@ export default defineComponent({
       }
 
       try {
-        // Llamada al backend
         const resp = await apiClient.post('/register', {
           email: email.value,
           password: password.value,
@@ -164,7 +163,6 @@ export default defineComponent({
           `Bienvenido/a, ${nombre.value}!`
         )
 
-        // Redirigir según rol
         router.push(
           role.value === 1
             ? '/dashboard-candidatos'

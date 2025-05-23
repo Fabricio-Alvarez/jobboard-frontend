@@ -168,7 +168,7 @@ const translateError = (field:string, msg:string) => {
   return msg
 }
 
-// Verificar rol de usuario
+
 const userRole = ref<number|null>(null)
 onMounted(async () => {
   try {

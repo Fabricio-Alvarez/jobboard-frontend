@@ -92,7 +92,7 @@
  
         <div class="info-buttons">
           <button @click="goToSomos" class="btn-somos">Quienes Somos</button>
-          <button @click="goToDashboard" class="btn-volver">Volver</button>
+          <button @click="goToCandidateProfile" class="btn-volver">Ver Perfil</button>
         </div>
       </div>
     </div>
@@ -133,8 +133,8 @@ export default defineComponent({
       router.push('/somos')
     }
 
-    const goToDashboard = () => {
-      router.push('/dashboard-candidatos')
+    const goToCandidateProfile = () => {
+      router.push('/candidates-profile')
     }
 
     const goToHistorialEmpleos = () => {
@@ -179,7 +179,6 @@ export default defineComponent({
     }
 
     const hideCategoriaOptions = () => {
-      // Retardo para que se registre el click antes de ocultar
       setTimeout(() => {
         showCategoriaOptions.value = false
       }, 100)
@@ -188,7 +187,7 @@ export default defineComponent({
     return {
       logout,
       goToSomos,
-      goToDashboard,
+      goToCandidateProfile: goToCandidateProfile,
       goToHistorialEmpleos,
       categoriaInput,
       filteredCategorias,

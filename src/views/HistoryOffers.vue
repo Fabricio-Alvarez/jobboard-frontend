@@ -257,7 +257,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Estilos generales */
+
 .dashboard-container {
   padding: 1.5rem;
   max-width: 1200px;
@@ -295,7 +295,6 @@ export default defineComponent({
   background: #c0392b;
 }
 
-/* Tabla de ofertas */
 .section-title {
   color: #2c3e50;
   font-size: 1.8rem;

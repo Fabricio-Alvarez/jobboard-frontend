@@ -5,7 +5,8 @@ const apiClient = axios.create({
   baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+    withCredentials: true     
 })
 
 // 👉 Interceptor para añadir el token automáticamente en cada petición

@@ -93,7 +93,7 @@ export default defineComponent({
         }
       } catch (err: any) {
         console.error('Error en login:', err.response?.data || err.message)
-        // Validaciones del backend
+  
         const validation = err.response?.data?.errors
         if (validation) {
           const msgs = Object.values(validation).flat().join('\n')
