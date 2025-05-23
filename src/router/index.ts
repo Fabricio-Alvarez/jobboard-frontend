@@ -12,40 +12,46 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/register',
-    component: () => import('@/views/Register.vue')
-  },
-  {
-    path: '/home',
-    component: () => import('@/views/Home.vue')
-  },
-  {
-    path: '/somos',
-    component: () => import('@/views/Somos.vue')
-  },
-  {
-    path: '/dashboard-reclutadores',
-    component: () => import('@/views/DashboardReclutadores.vue')
-  },
-  {
-    path: '/oferta',
-    component: () => import('@/views/Oferta.vue')
+    component: () => import('@/views/RegisterUser.vue')
   },
   {
     path: '/dashboard-candidatos',
-    component: () => import('@/views/DashboardCandidatos.vue')
+    component: () => import('@/views/CandidatesDashboard.vue')
+  },
+  {
+    path: '/somos',
+    component: () => import('@/views/AboutUs.vue')
+  },
+  {
+    path: '/dashboard-reclutadores',
+    component: () => import('@/views/RecruitersDashboard.vue')
+  },
+  {
+    path: '/oferta',
+    component: () => import('@/views/RegisterOffer.vue')
+  },
+  {
+    path: '/candidates-profile',
+    component: () => import('@/views/CandidatesProfile.vue')
   },
   {
     path: '/historial-ofertas',
-    component: () => import('@/views/HistorialOfertas.vue')
+    component: () => import('@/views/HistoryOffers.vue')
   },
   {
     path: '/historial-empleos',
-    component: () => import('@/views/HistorialEmpleos.vue')
+    component: () => import('@/views/AvailableJobs.vue')
   },
   {
-    path: '/candidatos/:id',
-    component: () => import('@/views/CandidatosOferta.vue')
-  }
+    path: '/postulacionesHistorial',
+    component: () => import('@/views/ApplicationHistory.vue')
+  },
+
+  {
+  path: '/actualizar-perfil',
+  name: 'EditarPerfilCandidato',
+  component: () => import('@/views/EditRecruiterProfile.vue')
+}
 ]
 
 const router = createRouter({
