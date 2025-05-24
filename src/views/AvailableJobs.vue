@@ -68,6 +68,10 @@
         >
           ← Regresar
         </ion-button>
+
+        <footer class="footer">
+          <p>Bolsa de Empleo SFC de Steven, Fabricio y Carlos de la UCR</p>
+        </footer>
       </div>
     </ion-content>
   </ion-page>
@@ -217,14 +221,13 @@ export default defineComponent({
 }
 
 .table-container {
-  background: #fff; 
+  background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   padding: 1.5rem;
   margin-bottom: 2rem;
 }
 
-/* --- ESTILOS NUEVOS PARA SCROLL --- */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -232,11 +235,7 @@ export default defineComponent({
 
 .ofertas-table {
   width: 100%;
-  min-width: 600px; 
-}
-/* ----------------------------------- */
-
-.ofertas-table {
+  min-width: 600px;
   border-collapse: collapse;
 }
 
@@ -284,5 +283,13 @@ export default defineComponent({
 .regresar-btn {
   margin: 1rem auto 2rem;
   max-width: 200px;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  border-top: 1px solid #ecf0f1;
 }
 </style>
