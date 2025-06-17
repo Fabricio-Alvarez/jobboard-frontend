@@ -9,6 +9,20 @@
       </div>
 
       <h2>Buscar Empleo</h2>
+      <ion-item class="form-group">
+        <ion-label class="icon-label" position="stacked">
+          <span class="emoji">📍</span> Lugar
+        </ion-label>
+        <ion-select interface="action-sheet" placeholder="Selecciona un lugar">
+          <ion-select-option value="San José">San José</ion-select-option>
+          <ion-select-option value="Alajuela">Alajuela</ion-select-option>
+          <ion-select-option value="Heredia">Heredia</ion-select-option>
+          <ion-select-option value="Cartago">Cartago</ion-select-option>
+          <ion-select-option value="Guanacaste">Guanacaste</ion-select-option>
+          <ion-select-option value="Puntarenas">Puntarenas</ion-select-option>
+          <ion-select-option value="Limón">Limón</ion-select-option>
+        </ion-select>
+      </ion-item>
       <div class="form-group">
         <label class="icon-label">
           <span class="emoji">💼</span> Categoría
@@ -38,22 +52,6 @@
           </div>
         </div>
       </div>
-
-      <ion-item class="form-group">
-        <ion-label class="icon-label" position="stacked">
-          <span class="emoji">📍</span> Lugar
-        </ion-label>
-        <ion-select interface="action-sheet" placeholder="Selecciona un lugar">
-          <ion-select-option value="San José">San José</ion-select-option>
-          <ion-select-option value="Alajuela">Alajuela</ion-select-option>
-          <ion-select-option value="Heredia">Heredia</ion-select-option>
-          <ion-select-option value="Cartago">Cartago</ion-select-option>
-          <ion-select-option value="Guanacaste">Guanacaste</ion-select-option>
-          <ion-select-option value="Puntarenas">Puntarenas</ion-select-option>
-          <ion-select-option value="Limón">Limón</ion-select-option>
-        </ion-select>
-      </ion-item>
-
 
       <div class="ver-empleos-container">
         <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
@@ -89,7 +87,7 @@
           Copyright 2025 - 2025<br />
           Para más información consulte el siguiente enlace
         </p>
- 
+
         <div class="info-buttons">
           <button @click="goToSomos" class="btn-somos">Quienes Somos</button>
           <button @click="goToCandidateProfile" class="btn-volver">Ver Perfil</button>
@@ -141,7 +139,6 @@ export default defineComponent({
       router.push('/historial-empleos')
     }
 
-    // Lista fija de categorías
     const categorias = [
       'Recepcionista',
       'Contador',
@@ -161,7 +158,6 @@ export default defineComponent({
       'Auxiliar de bodega'
     ]
 
-    // Reactive variables para autocompletado
     const categoriaInput = ref('')
     const filteredCategorias = ref<string[]>(categorias)
     const showCategoriaOptions = ref(false)
@@ -187,7 +183,7 @@ export default defineComponent({
     return {
       logout,
       goToSomos,
-      goToCandidateProfile: goToCandidateProfile,
+      goToCandidateProfile,
       goToHistorialEmpleos,
       categoriaInput,
       filteredCategorias,
@@ -339,7 +335,6 @@ h2 {
   background-color: #f8f8f8;
 }
 
-
 .ver-empleos-container {
   display: flex;
   justify-content: flex-start;
@@ -356,7 +351,6 @@ h2 {
   cursor: pointer;
   font-size: 0.85rem;
 }
-
 
 .info-buttons {
   display: flex;
