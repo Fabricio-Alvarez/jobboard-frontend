@@ -58,11 +58,17 @@
         </div>
       </div>
 
-      <button @click="buscarEmpleo" class="btn-ver-empleos">
-        Buscar Empleos
-      </button>
+      <!-- Botones alineados en una fila -->
+      <div class="buttons-container">
+        <button @click="buscarEmpleo" class="btn-ver-empleos">
+          Buscar Empleos
+        </button>
 
-      <!-- Mostrar los empleos encontrados -->
+        <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
+          Ver todos los empleos
+        </button>
+      </div>
+
       <div v-if="empleos.length">
         <h3>Empleos encontrados</h3>
         <div v-for="empleo in empleos" :key="empleo.id">
@@ -70,17 +76,22 @@
         </div>
       </div>
 
-      <!-- Botón para ver todos los empleos -->
-      <div class="ver-empleos-container">
-        <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
-          Ver todos los empleos
-        </button>
-      </div>
-
       <h3 class="subtitle">Últimas Búsquedas</h3>
       <div class="recent-searches">
-        <div class="search-item">
-          <span class="emoji">🕒</span> Sin búsquedas recientes
+        <div
+          class="search-item"
+          v-for="(busqueda, index) in ultimasBusquedas"
+          :key="index"
+        >
+          <span class="emoji">🕒</span>
+          <span>
+            <template v-if="busqueda.lugar && busqueda.categoria">
+              {{ busqueda.lugar }} - {{ busqueda.categoria }}
+            </template>
+            <template v-else>
+              Sin búsquedas recientes
+            </template>
+          </span>
         </div>
       </div>
 
@@ -153,6 +164,12 @@ export default defineComponent({
     const showCategoriaOptions = ref(false)
     const empleos = ref<any[]>([])
 
+    const ultimasBusquedas = ref([
+      { lugar: null, categoria: null },
+      { lugar: null, categoria: null },
+      { lugar: null, categoria: null }
+    ])
+
     const filterCategorias = () => {
       const search = categoriaInput.value.toLowerCase()
       filteredCategorias.value = filteredCategorias.value.filter((c) =>
@@ -171,7 +188,6 @@ export default defineComponent({
       }, 100)
     }
 
-    // Buscar empleos por categoría y ubicación
     const buscarEmpleo = async () => {
       if (!selectedLocation.value || !categoriaInput.value) {
         alert('Por favor selecciona una ubicación y categoría')
@@ -187,6 +203,16 @@ export default defineComponent({
         })
 
         empleos.value = response.data
+
+        // Actualizar historial de búsquedas
+        ultimasBusquedas.value.unshift({
+          lugar: selectedLocation.value,
+          categoria: categoriaInput.value
+        })
+        if (ultimasBusquedas.value.length > 3) {
+          ultimasBusquedas.value.pop()
+        }
+
       } catch (error) {
         console.error('Error al buscar empleos:', error)
       }
@@ -221,7 +247,8 @@ export default defineComponent({
       showCategoriaOptions,
       hideCategoriaOptions,
       buscarEmpleo,
-      empleos
+      empleos,
+      ultimasBusquedas
     }
   }
 })
@@ -313,6 +340,26 @@ h2 {
   background-color: #f0f0f0;
 }
 
+.buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: flex-start; /* Cambia a center si quieres que estén centrados */
+}
+
+.btn-ver-empleos {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.85rem;
+  flex: 1;
+  max-width: 180px;
+}
+
 .subtitle {
   margin-top: 2rem;
   color: #1a73e8;
@@ -364,23 +411,6 @@ h2 {
   padding: 1rem 0;
   border-top: 1px solid #ddd;
   background-color: #f8f8f8;
-}
-
-.ver-empleos-container {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 0.5rem;
-}
-
-.btn-ver-empleos {
-  background-color: #1a73e8;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 0.85rem;
 }
 
 .info-buttons {
