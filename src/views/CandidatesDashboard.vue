@@ -13,7 +13,11 @@
         <ion-label class="icon-label" position="stacked">
           <span class="emoji">📍</span> Lugar
         </ion-label>
-        <ion-select interface="action-sheet" placeholder="Selecciona un lugar">
+        <ion-select
+          interface="action-sheet"
+          placeholder="Selecciona un lugar"
+          v-model="selectedLocation"
+        >
           <ion-select-option value="San José">San José</ion-select-option>
           <ion-select-option value="Alajuela">Alajuela</ion-select-option>
           <ion-select-option value="Heredia">Heredia</ion-select-option>
@@ -23,6 +27,7 @@
           <ion-select-option value="Limón">Limón</ion-select-option>
         </ion-select>
       </ion-item>
+
       <div class="form-group">
         <label class="icon-label">
           <span class="emoji">💼</span> Categoría
@@ -53,6 +58,19 @@
         </div>
       </div>
 
+      <button @click="buscarEmpleo" class="btn-ver-empleos">
+        Buscar Empleos
+      </button>
+
+      <!-- Mostrar los empleos encontrados -->
+      <div v-if="empleos.length">
+        <h3>Empleos encontrados</h3>
+        <div v-for="empleo in empleos" :key="empleo.id">
+          <p>{{ empleo.job_title }} - {{ empleo.location }}</p>
+        </div>
+      </div>
+
+      <!-- Botón para ver todos los empleos -->
       <div class="ver-empleos-container">
         <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
           Ver todos los empleos
@@ -61,12 +79,6 @@
 
       <h3 class="subtitle">Últimas Búsquedas</h3>
       <div class="recent-searches">
-        <div class="search-item">
-          <span class="emoji">🕒</span> Sin búsquedas recientes
-        </div>
-        <div class="search-item">
-          <span class="emoji">🕒</span> Sin búsquedas recientes
-        </div>
         <div class="search-item">
           <span class="emoji">🕒</span> Sin búsquedas recientes
         </div>
@@ -102,14 +114,9 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import {
-  IonPage,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption
-} from '@ionic/vue'
 import { useRouter } from 'vue-router'
+import { IonPage, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/vue'
+import apiClient from '@/services/apiClient'
 
 export default defineComponent({
   name: 'Home',
@@ -122,6 +129,68 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter()
+
+    const selectedLocation = ref<string | null>(null)
+    const categoriaInput = ref('')
+    const filteredCategorias = ref([
+      'Recepcionista',
+      'Contador',
+      'Asistente administrativo',
+      'Ingeniero industrial',
+      'Técnico en electrónica',
+      'Desarrollador web',
+      'Secretaria',
+      'Diseñador gráfico',
+      'Operario de producción',
+      'Agente de servicio al cliente',
+      'Auxiliar contable',
+      'Mecánico automotriz',
+      'Cocinero',
+      'Guardia de seguridad',
+      'Profesor de inglés',
+      'Auxiliar de bodega'
+    ])
+    const showCategoriaOptions = ref(false)
+    const empleos = ref<any[]>([])
+
+    const filterCategorias = () => {
+      const search = categoriaInput.value.toLowerCase()
+      filteredCategorias.value = filteredCategorias.value.filter((c) =>
+        c.toLowerCase().includes(search)
+      )
+    }
+
+    const selectCategoria = (categoria: string) => {
+      categoriaInput.value = categoria
+      showCategoriaOptions.value = false
+    }
+
+    const hideCategoriaOptions = () => {
+      setTimeout(() => {
+        showCategoriaOptions.value = false
+      }, 100)
+    }
+
+    // Buscar empleos por categoría y ubicación
+    const buscarEmpleo = async () => {
+      if (!selectedLocation.value || !categoriaInput.value) {
+        alert('Por favor selecciona una ubicación y categoría')
+        return
+      }
+
+      try {
+        const response = await apiClient.get('/job-offers/search', {
+          params: {
+            category: categoriaInput.value,
+            location: selectedLocation.value
+          }
+        })
+
+        empleos.value = response.data
+      } catch (error) {
+        console.error('Error al buscar empleos:', error)
+      }
+    }
 
     const logout = () => {
       router.push('/login')
@@ -139,58 +208,20 @@ export default defineComponent({
       router.push('/historial-empleos')
     }
 
-    const categorias = [
-      'Recepcionista',
-      'Contador',
-      'Asistente administrativo',
-      'Ingeniero industrial',
-      'Técnico en electrónica',
-      'Desarrollador web',
-      'Secretaria',
-      'Diseñador gráfico',
-      'Operario de producción',
-      'Agente de servicio al cliente',
-      'Auxiliar contable',
-      'Mecánico automotriz',
-      'Cocinero',
-      'Guardia de seguridad',
-      'Profesor de inglés',
-      'Auxiliar de bodega'
-    ]
-
-    const categoriaInput = ref('')
-    const filteredCategorias = ref<string[]>(categorias)
-    const showCategoriaOptions = ref(false)
-
-    const filterCategorias = () => {
-      const search = categoriaInput.value.toLowerCase()
-      filteredCategorias.value = categorias.filter((c) =>
-        c.toLowerCase().includes(search)
-      )
-    }
-
-    const selectCategoria = (categoria: string) => {
-      categoriaInput.value = categoria
-      showCategoriaOptions.value = false
-    }
-
-    const hideCategoriaOptions = () => {
-      setTimeout(() => {
-        showCategoriaOptions.value = false
-      }, 100)
-    }
-
     return {
       logout,
       goToSomos,
       goToCandidateProfile,
       goToHistorialEmpleos,
+      selectedLocation,
       categoriaInput,
       filteredCategorias,
       filterCategorias,
       selectCategoria,
       showCategoriaOptions,
-      hideCategoriaOptions
+      hideCategoriaOptions,
+      buscarEmpleo,
+      empleos
     }
   }
 })
