@@ -31,13 +31,24 @@
               <td>{{ app.message }}</td>
               <td>{{ app.status }}</td>
               <td>
-                <button v-if="app.status === 'pendiente'" @click="approve(app.id)" class="btn-approve">
+                <button
+                  v-if="app.status === 'pendiente'"
+                  @click="approve(app.id)"
+                  class="btn-approve"
+                >
                   Aprobar
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div>
+        <div class="navigation-wrapper">
+          <ion-button color="medium" class="regresar-btn" @click="goBack">
+            ← Regresar
+          </ion-button>
+        </div>
       </div>
     </ion-content>
   </ion-page>
@@ -46,13 +57,13 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { IonPage, IonContent } from "@ionic/vue";
+import { IonPage, IonContent, IonButton } from "@ionic/vue";
 import apiClient from "@/services/apiClient";
 import { alertController } from "@ionic/vue";
 
 export default defineComponent({
   name: "ListJobApplicationsForOffer",
-  components: { IonPage, IonContent },
+  components: { IonPage, IonContent, IonButton },
   setup() {
     const router = useRouter();
     const route = useRoute();
@@ -95,6 +106,9 @@ export default defineComponent({
       }
     };
 
+    const goBack = () => {
+      router.push("/historial-ofertas");
+    };
     onMounted(() => {
       if (!offerId) {
         router.replace("/dashboard-reclutadores");
@@ -103,7 +117,7 @@ export default defineComponent({
       }
     });
 
-    return { applications, loading, logout, approve };
+    return { applications, loading, logout, approve, goBack };
   },
 });
 </script>
@@ -179,5 +193,18 @@ export default defineComponent({
 
 .btn-approve:hover {
   background: #27ae60;
+}
+
+.navigation-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.regresar-btn {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  max-width: 200px;
+  width: auto;
 }
 </style>

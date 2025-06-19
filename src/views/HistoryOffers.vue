@@ -40,14 +40,17 @@
                 <td class="acciones">
                   <button @click="abrirEditor(oferta)" class="btn-edit" title="Editar">✏️</button>
                   <button @click="confirmarEliminacion(oferta.id)" class="btn-delete" title="Eliminar">🗑️</button>
-                  <button @click="verCandidatos(oferta.id)" class="btn-candidates" title="Ver Candidatos">👤</button>
+                  <!-- Botón para ver postulaciones de esta oferta -->
+                  <button @click="verCandidatos(oferta.id)" class="btn-candidates" title="Ver Candidatos">
+                    👤
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-     
+        <!-- Modal de confirmación de eliminación -->
         <div v-if="mostrarModal" class="modal-backdrop">
           <div class="modal-content confirmation-modal">
             <div class="modal-header">
@@ -69,7 +72,7 @@
           </div>
         </div>
 
-     
+        <!-- Modal de edición -->
         <div v-if="editarModal" class="modal-backdrop">
           <div class="modal-content edit-modal">
             <div class="modal-header">
@@ -111,7 +114,6 @@
           </div>
         </div>
 
-        
         <ion-button expand="block" color="medium" class="regresar-btn" @click="goBack">
           ← Regresar
         </ion-button>
@@ -127,7 +129,7 @@ import { IonPage, IonContent, IonButton, onIonViewWillEnter } from '@ionic/vue'
 import apiClient from '@/services/apiClient'
 
 export default defineComponent({
-  name: 'HistorialOfertas',
+  name: 'HistoryOffers',
   components: { IonPage, IonContent, IonButton },
   setup() {
     const router = useRouter()
@@ -187,8 +189,8 @@ export default defineComponent({
       router.replace('/login')
     }
 
-    const verCandidatos = (id: number) => {
-      router.push(`/candidatos/${id}`)
+    const verCandidatos = (offerId: number) => {
+      router.push(`/job-offers/${offerId}/applications`)
     }
 
     const confirmarEliminacion = (id: number) => {
@@ -217,7 +219,7 @@ export default defineComponent({
     }
     const cancelarEdicion = () => {
       editarModal.value = false
-      ofertaEditar.value = { id: null, job_title: '', description: '', location: '', salary: '', category: '' }
+      ofertaEditar.value = { id: null, job_title: '', description: '', location: '', salary: null, category: '' }
     }
     const actualizarOfertaConfirmada = async () => {
       try {
@@ -256,6 +258,8 @@ export default defineComponent({
 })
 </script>
 
+
+
 <style scoped>
 
 .dashboard-container {
@@ -266,6 +270,10 @@ export default defineComponent({
   color: #2c3e50;
 }
 
+.regresar-btn {
+  margin: 1rem auto 2rem;
+  max-width: 200px;
+}
 .top-bar {
   display: flex;
   justify-content: space-between;
