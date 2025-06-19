@@ -105,7 +105,7 @@ export default defineComponent({
     const toastMessage = ref('')
     const selectedOfferId = ref<number | null>(null)
 
-    // Obtiene filtros desde query params
+
     const filtroLocation = ref<string | null>(
       (route.query.location as string) || null
     )
@@ -125,7 +125,7 @@ export default defineComponent({
       }
     }
 
-    // Computed que filtra las ofertas según query params
+
     const ofertasFiltradas = computed(() => {
       return ofertas.value.filter((oferta) => {
         const matchLocation = filtroLocation.value
@@ -138,7 +138,7 @@ export default defineComponent({
       })
     })
 
-    // Para manejar cambios en query params mientras la vista está activa
+
     watch(
       () => route.query,
       (newQuery) => {
@@ -216,7 +216,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* (Mantén el CSS que ya tienes) */
+
 .dashboard-container {
   padding: 1.5rem;
   max-width: 1200px;

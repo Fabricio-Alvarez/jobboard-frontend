@@ -148,7 +148,7 @@ export default defineComponent({
     const showCategoriaOptions = ref(false)
     const ultimasBusquedas = ref<{ lugar: string | null, categoria: string | null }[]>([])
 
-    // Cargar últimas búsquedas de localStorage al montar componente
+
     onMounted(() => {
       const storedBusquedas = localStorage.getItem('ultimasBusquedas')
       if (storedBusquedas) {
@@ -192,7 +192,7 @@ export default defineComponent({
         ultimasBusquedas.value.pop()
       }
 
-      // Guardar en localStorage para persistencia
+
       localStorage.setItem('ultimasBusquedas', JSON.stringify(ultimasBusquedas.value))
 
       router.push({

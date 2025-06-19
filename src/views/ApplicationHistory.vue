@@ -123,7 +123,6 @@ export default defineComponent({
         const resp = await apiClient.get("/job-applications");
         postulaciones.value = resp.data;
 
-        // Notificación para postulaciones aprobadas (solo una vez por postulación)
         resp.data.forEach(async (p: any) => {
           if (
             p.status === "aceptada" &&
@@ -169,7 +168,7 @@ export default defineComponent({
 
     const logout = () => {
       localStorage.removeItem("auth_token");
-      // Limpia notificaciones al salir
+
       postulaciones.value.forEach((p: any) => {
         localStorage.removeItem("notificado_aprobada_" + p.id);
       });

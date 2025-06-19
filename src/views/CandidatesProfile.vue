@@ -6,7 +6,7 @@
       </div>
 
       <div class="profile-section">
-       
+
         <img :src="profilePhotoUrl || defaultProfilePhoto" alt="Foto de perfil" class="profile-pic" />
         <p class="user-name">{{ fullName }}</p>
       </div>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="scrollable-content">
-       
+
         <div class="card">
           <div class="card-border"></div>
           <div class="card-content">
@@ -30,7 +30,7 @@
           </div>
         </div>
 
-      
+
         <div class="card">
           <div class="card-border"></div>
           <div class="card-content">
@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        
+
         <div class="card">
           <div class="card-border"></div>
           <div class="card-content">
@@ -84,11 +84,6 @@ export default defineComponent({
     const fileInput = ref<HTMLInputElement | null>(null)
     const photoInput = ref<HTMLInputElement | null>(null)
     const cvFileName = ref<string>('')
-    const cvUrl = ref<string>('')
-    const profilePhotoUrl = ref<string>('')
-    const defaultProfilePhoto = '@/assets/imagenvacia.png'
-
-    const fullName = ref<string>('Cargando...')
 
     const email = localStorage.getItem('email') || ''
     const password = localStorage.getItem('password') || ''
@@ -117,11 +112,7 @@ export default defineComponent({
       if (target.files && target.files.length > 0) {
         const file = target.files[0]
         if (file.type !== 'application/pdf') {
-          alert('Por favor, selecciona un archivo PDF.')
-          return
-        }
 
-        cvFileName.value = file.name
         await uploadCV(file)
       }
     }
@@ -131,17 +122,13 @@ export default defineComponent({
       if (target.files && target.files.length > 0) {
         const file = target.files[0]
         if (!file.type.startsWith('image/')) {
-          alert('Por favor, selecciona una imagen válida.')
-          return
-        }
 
-        profilePhotoUrl.value = URL.createObjectURL(file)
         await uploadProfilePhoto(file)
       }
     }
 
     const abrirCV = () => {
-      if (cvUrl.value) {
+
         window.open(cvUrl.value, '_blank')
       }
     }
@@ -158,9 +145,7 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('Error al subir el CV')
-        alert('CV subido exitosamente')
-      } catch (error) {
-        alert(`Error: ${(error as Error).message}`)
+
       }
     }
 
@@ -176,32 +161,32 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('Error al subir la imagen')
-        alert('Imagen de perfil actualizada')
-      } catch (error) {
-        alert(`Error: ${(error as Error).message}`)
+
       }
     }
 
     const fetchProfilePhoto = async () => {
       try {
+
         const response = await fetch(`/api/photo?email=${email}`)
         if (!response.ok) return
         const data = await response.json()
         profilePhotoUrl.value = data.imageUrl || ''
       } catch (error) {
-        console.error('Error al obtener imagen de perfil:', error)
+
       }
     }
 
     const fetchCV = async () => {
       try {
+
         const response = await fetch(`/api/cv?email=${email}`)
         if (!response.ok) return
         const data = await response.json()
         cvFileName.value = data.fileName || ''
         cvUrl.value = data.cvUrl || ''
       } catch (error) {
-        console.error('Error al cargar CV:', error)
+
       }
     }
 
@@ -217,10 +202,6 @@ export default defineComponent({
 
         if (!response.ok) throw new Error('No se pudo obtener el nombre')
 
-        const data = await response.json()
-        fullName.value = `${data.nombre} ${data.apellido}`
-      } catch (error) {
-        console.error('Error al obtener el nombre:', error)
         fullName.value = 'Usuario'
       }
     }
