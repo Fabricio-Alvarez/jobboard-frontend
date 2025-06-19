@@ -58,40 +58,34 @@
         </div>
       </div>
 
-      <!-- Botones alineados en una fila -->
       <div class="buttons-container">
         <button @click="buscarEmpleo" class="btn-ver-empleos">
           Buscar Empleos
         </button>
-
         <button @click="goToHistorialEmpleos" class="btn-ver-empleos">
           Ver todos los empleos
         </button>
-      </div>
-
-      <div v-if="empleos.length">
-        <h3>Empleos encontrados</h3>
-        <div v-for="empleo in empleos" :key="empleo.id">
-          <p>{{ empleo.job_title }} - {{ empleo.location }}</p>
-        </div>
       </div>
 
       <h3 class="subtitle">Últimas Búsquedas</h3>
       <div class="recent-searches">
         <div
           class="search-item"
-          v-for="(busqueda, index) in ultimasBusquedas"
+          v-for="(busqueda, index) in ultimasBusquedas.filter(b => b.lugar && b.categoria)"
           :key="index"
         >
           <span class="emoji">🕒</span>
-          <span>
-            <template v-if="busqueda.lugar && busqueda.categoria">
-              {{ busqueda.lugar }} - {{ busqueda.categoria }}
-            </template>
-            <template v-else>
-              Sin búsquedas recientes
-            </template>
-          </span>
+          <span>{{ busqueda.lugar }} - {{ busqueda.categoria }}</span>
+        </div>
+
+        <div v-if="ultimasBusquedas.filter(b => b.lugar && b.categoria).length === 0" class="no-searches-box">
+          <span class="emoji-large">🔍</span>
+          <p class="no-searches-text">Última búsqueda</p>
+          <p class="last-search-values">
+            <span class="value-box">{{ selectedLocation || 'No seleccionado' }}</span>
+            <span class="separator">|</span>
+            <span class="value-box">{{ categoriaInput || 'No seleccionado' }}</span>
+          </p>
         </div>
       </div>
 
@@ -124,10 +118,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { IonPage, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/vue'
-import apiClient from '@/services/apiClient'
 
 export default defineComponent({
   name: 'Home',
@@ -143,36 +136,33 @@ export default defineComponent({
 
     const selectedLocation = ref<string | null>(null)
     const categoriaInput = ref('')
-    const filteredCategorias = ref([
-      'Recepcionista',
-      'Contador',
-      'Asistente administrativo',
-      'Ingeniero industrial',
-      'Técnico en electrónica',
-      'Desarrollador web',
-      'Secretaria',
-      'Diseñador gráfico',
-      'Operario de producción',
-      'Agente de servicio al cliente',
-      'Auxiliar contable',
-      'Mecánico automotriz',
-      'Cocinero',
-      'Guardia de seguridad',
-      'Profesor de inglés',
-      'Auxiliar de bodega'
-    ])
+    const categorias = [
+      'Recepcionista', 'Contador', 'Asistente administrativo',
+      'Ingeniero industrial', 'Técnico en electrónica', 'Desarrollador web',
+      'Secretaria', 'Diseñador gráfico', 'Operario de producción',
+      'Agente de servicio al cliente', 'Auxiliar contable',
+      'Mecánico automotriz', 'Cocinero', 'Guardia de seguridad',
+      'Profesor de inglés', 'Auxiliar de bodega'
+    ]
+    const filteredCategorias = ref([...categorias])
     const showCategoriaOptions = ref(false)
-    const empleos = ref<any[]>([])
+    const ultimasBusquedas = ref<{ lugar: string | null, categoria: string | null }[]>([])
 
-    const ultimasBusquedas = ref([
-      { lugar: null, categoria: null },
-      { lugar: null, categoria: null },
-      { lugar: null, categoria: null }
-    ])
+    // Cargar últimas búsquedas de localStorage al montar componente
+    onMounted(() => {
+      const storedBusquedas = localStorage.getItem('ultimasBusquedas')
+      if (storedBusquedas) {
+        try {
+          ultimasBusquedas.value = JSON.parse(storedBusquedas)
+        } catch (e) {
+          ultimasBusquedas.value = []
+        }
+      }
+    })
 
     const filterCategorias = () => {
       const search = categoriaInput.value.toLowerCase()
-      filteredCategorias.value = filteredCategorias.value.filter((c) =>
+      filteredCategorias.value = categorias.filter(c =>
         c.toLowerCase().includes(search)
       )
     }
@@ -188,51 +178,36 @@ export default defineComponent({
       }, 100)
     }
 
-    const buscarEmpleo = async () => {
+    const buscarEmpleo = () => {
       if (!selectedLocation.value || !categoriaInput.value) {
         alert('Por favor selecciona una ubicación y categoría')
         return
       }
 
-      try {
-        const response = await apiClient.get('/job-offers/search', {
-          params: {
-            category: categoriaInput.value,
-            location: selectedLocation.value
-          }
-        })
-
-        empleos.value = response.data
-
-        // Actualizar historial de búsquedas
-        ultimasBusquedas.value.unshift({
-          lugar: selectedLocation.value,
-          categoria: categoriaInput.value
-        })
-        if (ultimasBusquedas.value.length > 3) {
-          ultimasBusquedas.value.pop()
-        }
-
-      } catch (error) {
-        console.error('Error al buscar empleos:', error)
+      ultimasBusquedas.value.unshift({
+        lugar: selectedLocation.value,
+        categoria: categoriaInput.value
+      })
+      if (ultimasBusquedas.value.length > 3) {
+        ultimasBusquedas.value.pop()
       }
+
+      // Guardar en localStorage para persistencia
+      localStorage.setItem('ultimasBusquedas', JSON.stringify(ultimasBusquedas.value))
+
+      router.push({
+        path: '/historial-empleos',
+        query: {
+          location: selectedLocation.value,
+          category: categoriaInput.value
+        }
+      })
     }
 
-    const logout = () => {
-      router.push('/login')
-    }
-
-    const goToSomos = () => {
-      router.push('/somos')
-    }
-
-    const goToCandidateProfile = () => {
-      router.push('/candidates-profile')
-    }
-
-    const goToHistorialEmpleos = () => {
-      router.push('/historial-empleos')
-    }
+    const logout = () => router.push('/login')
+    const goToSomos = () => router.push('/somos')
+    const goToCandidateProfile = () => router.push('/candidates-profile')
+    const goToHistorialEmpleos = () => router.push('/historial-empleos')
 
     return {
       logout,
@@ -247,7 +222,6 @@ export default defineComponent({
       showCategoriaOptions,
       hideCategoriaOptions,
       buscarEmpleo,
-      empleos,
       ultimasBusquedas
     }
   }
@@ -344,7 +318,7 @@ h2 {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
-  justify-content: flex-start; /* Cambia a center si quieres que estén centrados */
+  justify-content: flex-start;
 }
 
 .btn-ver-empleos {
@@ -363,6 +337,57 @@ h2 {
 .subtitle {
   margin-top: 2rem;
   color: #1a73e8;
+}
+
+.no-searches-box {
+  border: 2px dashed #1a73e8;
+  background-color: #e8f0fe;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  color: #1a73e8;
+  font-weight: 600;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.no-searches-box .emoji-large {
+  font-size: 2.5rem;
+}
+
+.no-searches-text {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.last-search-values {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.value-box {
+  background-color: #1a73e8;
+  color: white;
+  padding: 0.2rem 0.7rem;
+  border-radius: 9999px;
+  min-width: 100px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.4);
+}
+
+.separator {
+  align-self: center;
+  color: #555;
+  font-weight: 400;
+  user-select: none;
 }
 
 .recent-searches {

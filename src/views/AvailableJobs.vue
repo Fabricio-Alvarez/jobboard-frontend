@@ -18,6 +18,9 @@
           <div v-else-if="ofertas.length === 0" class="no-ofertas">
             Aún no hay empleos disponibles.
           </div>
+          <div v-else-if="ofertasFiltradas.length === 0" class="no-ofertas">
+            No se encontraron empleos que coincidan con los filtros.
+          </div>
 
           <div v-else class="table-responsive">
             <table class="ofertas-table">
@@ -32,7 +35,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="oferta in ofertas" :key="oferta.id">
+                <tr v-for="oferta in ofertasFiltradas" :key="oferta.id">
                   <td>{{ oferta.job_title }}</td>
                   <td>{{ oferta.description }}</td>
                   <td>{{ oferta.location }}</td>
@@ -78,9 +81,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue'
-import { IonPage, IonContent, IonButton, IonToast, alertController } from '@ionic/vue'
-import { useRouter } from 'vue-router'
+import { defineComponent, ref, reactive, computed, onMounted, watch } from 'vue'
+import {
+  IonPage,
+  IonContent,
+  IonButton,
+  IonToast,
+  alertController
+} from '@ionic/vue'
+import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/services/apiClient'
 
 export default defineComponent({
@@ -88,12 +97,21 @@ export default defineComponent({
   components: { IonPage, IonContent, IonButton, IonToast },
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const ofertas = ref<any[]>([])
     const loading = ref(true)
     const loadingPost = reactive<Record<number, boolean>>({})
     const showToast = ref(false)
     const toastMessage = ref('')
     const selectedOfferId = ref<number | null>(null)
+
+    // Obtiene filtros desde query params
+    const filtroLocation = ref<string | null>(
+      (route.query.location as string) || null
+    )
+    const filtroCategory = ref<string | null>(
+      (route.query.category as string) || null
+    )
 
     const fetchOffers = async () => {
       loading.value = true
@@ -106,6 +124,28 @@ export default defineComponent({
         loading.value = false
       }
     }
+
+    // Computed que filtra las ofertas según query params
+    const ofertasFiltradas = computed(() => {
+      return ofertas.value.filter((oferta) => {
+        const matchLocation = filtroLocation.value
+          ? oferta.location === filtroLocation.value
+          : true
+        const matchCategory = filtroCategory.value
+          ? oferta.category === filtroCategory.value
+          : true
+        return matchLocation && matchCategory
+      })
+    })
+
+    // Para manejar cambios en query params mientras la vista está activa
+    watch(
+      () => route.query,
+      (newQuery) => {
+        filtroLocation.value = (newQuery.location as string) || null
+        filtroCategory.value = (newQuery.category as string) || null
+      }
+    )
 
     const askForMessage = async (offerId: number) => {
       selectedOfferId.value = offerId
@@ -136,7 +176,10 @@ export default defineComponent({
       const id = selectedOfferId.value!
       loadingPost[id] = true
       try {
-        await apiClient.post('/job-applications', { job_offer_id: id, message })
+        await apiClient.post('/job-applications', {
+          job_offer_id: id,
+          message
+        })
         toastMessage.value = '¡Postulación enviada con éxito!'
       } catch (e: any) {
         toastMessage.value =
@@ -165,13 +208,15 @@ export default defineComponent({
       toastMessage,
       askForMessage,
       logout,
-      goBack
+      goBack,
+      ofertasFiltradas
     }
   }
 })
 </script>
 
 <style scoped>
+/* (Mantén el CSS que ya tienes) */
 .dashboard-container {
   padding: 1.5rem;
   max-width: 1200px;
