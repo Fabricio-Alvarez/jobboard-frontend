@@ -12,9 +12,7 @@
         <div class="table-container">
           <h2 class="section-title">Historial de postulaciones realizadas</h2>
 
-          <div v-if="loading" class="loading">
-            Cargando postulaciones...
-          </div>
+          <div v-if="loading" class="loading">Cargando postulaciones...</div>
           <div v-else-if="postulaciones.length === 0" class="no-ofertas">
             No tienes postulaciones activas.
           </div>
@@ -40,7 +38,12 @@
                 <td>{{ postulacion.job_offer.category }}</td>
                 <td>{{ postulacion.status }}</td>
                 <td class="acciones">
-                  <button @click="confirmarEliminacion(postulacion.id)" class="btn-delete" title="Eliminar Postulación">
+                  <button
+                    v-if="postulacion.status === 'pendiente'"
+                    @click="confirmarEliminacion(postulacion.id)"
+                    class="btn-delete"
+                    title="Eliminar Postulación"
+                  >
                     🗑️ Eliminar
                   </button>
                 </td>
@@ -57,7 +60,10 @@
             </div>
             <div class="modal-body">
               <p>¿Estás seguro que deseas eliminar esta postulación?</p>
-              <p class="warning-text"><i class="fas fa-exclamation-circle"></i> Esta acción no se puede deshacer.</p>
+              <p class="warning-text">
+                <i class="fas fa-exclamation-circle"></i> Esta acción no se
+                puede deshacer.
+              </p>
             </div>
             <div class="modal-actions">
               <button @click="cancelarEliminacion" class="btn btn-cancel">
@@ -70,7 +76,12 @@
           </div>
         </div>
 
-        <ion-button expand="block" color="medium" class="regresar-btn" @click="goBack">
+        <ion-button
+          expand="block"
+          color="medium"
+          class="regresar-btn"
+          @click="goBack"
+        >
           ← Regresar
         </ion-button>
       </div>
@@ -83,89 +94,117 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { IonPage, IonContent, IonButton, onIonViewWillEnter } from '@ionic/vue'
-import apiClient from '@/services/apiClient'
+import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
+import {
+  IonPage,
+  IonContent,
+  IonButton,
+  onIonViewWillEnter,
+  toastController,
+} from "@ionic/vue";
+import apiClient from "@/services/apiClient";
 
 export default defineComponent({
-  name: 'MisPostulaciones',
+  name: "MisPostulaciones",
   components: { IonPage, IonContent, IonButton },
   setup() {
-    const router = useRouter()
-    const postulaciones = ref<any[]>([])
-    const loading = ref(true)
-    const userRole = ref<number | null>(null)
+    const router = useRouter();
+    const postulaciones = ref<any[]>([]);
+    const loading = ref(true);
+    const userRole = ref<number | null>(null);
 
-    const mostrarModal = ref(false)
-    const ofertaAEliminar = ref<number | null>(null)
+    const mostrarModal = ref(false);
+    const ofertaAEliminar = ref<number | null>(null);
 
     const obtenerPostulaciones = async () => {
-      loading.value = true
+      loading.value = true;
       try {
-        const resp = await apiClient.get('/job-applications')
-        postulaciones.value = resp.data
+        const resp = await apiClient.get("/job-applications");
+        postulaciones.value = resp.data;
+
+        // Notificación para postulaciones aprobadas (solo una vez por postulación)
+        resp.data.forEach(async (p: any) => {
+          if (
+            p.status === "aceptada" &&
+            !localStorage.getItem("notificado_aprobada_" + p.id)
+          ) {
+            const toast = await toastController.create({
+              message: `¡Felicidades! Tu postulación a "${p.job_offer.job_title}" fue aprobada.`,
+              duration: 3500,
+              color: "success",
+            });
+            await toast.present();
+            localStorage.setItem("notificado_aprobada_" + p.id, "1");
+          }
+        });
       } catch (e) {
-        console.error(e)
+        console.error(e);
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
 
     const validarAcceso = async () => {
       try {
-        const resp = await apiClient.get('/user')
-        userRole.value = resp.data.role
+        const resp = await apiClient.get("/user");
+        userRole.value = resp.data.role;
         if (userRole.value === 1) {
-          await obtenerPostulaciones()
+          await obtenerPostulaciones();
         } else {
-          router.replace('/login')
+          router.replace("/login");
         }
       } catch {
-        router.replace('/login')
+        router.replace("/login");
       }
-    }
+    };
 
     onIonViewWillEnter(() => {
       if (userRole.value === 1) {
-        obtenerPostulaciones()
+        obtenerPostulaciones();
       }
-    })
+    });
 
-    validarAcceso()
+    validarAcceso();
 
     const logout = () => {
-      localStorage.removeItem('auth_token')
-      router.replace('/login')
-    }
+      localStorage.removeItem("auth_token");
+      // Limpia notificaciones al salir
+      postulaciones.value.forEach((p: any) => {
+        localStorage.removeItem("notificado_aprobada_" + p.id);
+      });
+      router.replace("/login");
+    };
 
     const confirmarEliminacion = (id: number) => {
-      ofertaAEliminar.value = id
-      mostrarModal.value = true
-    }
+      ofertaAEliminar.value = id;
+      mostrarModal.value = true;
+    };
 
     const cancelarEliminacion = () => {
-      mostrarModal.value = false
-      ofertaAEliminar.value = null
-    }
+      mostrarModal.value = false;
+      ofertaAEliminar.value = null;
+    };
 
     const eliminarPostulacion = async () => {
-      if (!ofertaAEliminar.value) return
+      if (!ofertaAEliminar.value) return;
       try {
-        await apiClient.delete(`/job-applications/${ofertaAEliminar.value}`)
-        postulaciones.value = postulaciones.value.filter(p => p.id !== ofertaAEliminar.value)
-        mostrarModal.value = false
-        alert('Postulación eliminada correctamente')
+        await apiClient.delete(`/job-applications/${ofertaAEliminar.value}`);
+        postulaciones.value = postulaciones.value.filter(
+          (p) => p.id !== ofertaAEliminar.value
+        );
+        mostrarModal.value = false;
+        alert("Postulación eliminada correctamente");
       } catch (e: any) {
-        alert(e.response?.data?.message || 'Error al eliminar la postulación')
+        alert(e.response?.data?.message || "Error al eliminar la postulación");
       } finally {
-        cancelarEliminacion()
+        cancelarEliminacion();
       }
-    }
+    };
 
     const goBack = () => {
-      router.push('/candidates-profile')
-    }
+      router.push("/candidates-profile");
+    };
 
     return {
       postulaciones,
@@ -176,10 +215,10 @@ export default defineComponent({
       confirmarEliminacion,
       cancelarEliminacion,
       eliminarPostulacion,
-      goBack
-    }
-  }
-})
+      goBack,
+    };
+  },
+});
 </script>
 
 <style scoped>
@@ -187,7 +226,7 @@ export default defineComponent({
   padding: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #2c3e50;
 }
 
@@ -235,7 +274,8 @@ export default defineComponent({
   margin-bottom: 2rem;
 }
 
-.loading, .no-ofertas {
+.loading,
+.no-ofertas {
   text-align: center;
   padding: 2rem;
   font-size: 1.1rem;
