@@ -168,6 +168,7 @@ export default defineComponent({
 
     const logout = () => {
       localStorage.removeItem("auth_token");
+
       postulaciones.value.forEach((p: any) => {
         localStorage.removeItem("notificado_aprobada_" + p.id);
       });

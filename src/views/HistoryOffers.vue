@@ -40,6 +40,7 @@
                 <td class="acciones">
                   <button @click="abrirEditor(oferta)" class="btn-edit" title="Editar">✏️</button>
                   <button @click="confirmarEliminacion(oferta.id)" class="btn-delete" title="Eliminar">🗑️</button>
+
                   <button @click="verCandidatos(oferta.id)" class="btn-candidates" title="Ver Candidatos">
                     👤
                   </button>
@@ -48,6 +49,7 @@
             </tbody>
           </table>
         </div>
+
 
         <div v-if="mostrarModal" class="modal-backdrop">
           <div class="modal-content confirmation-modal">
@@ -69,6 +71,7 @@
             </div>
           </div>
         </div>
+
 
         <div v-if="editarModal" class="modal-backdrop">
           <div class="modal-content edit-modal">
@@ -414,6 +417,7 @@ export default defineComponent({
 .btn-candidates:hover {
   background: #e8f8f0;
 }
+
 
 .modal-backdrop {
   position: fixed;

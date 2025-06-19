@@ -6,6 +6,7 @@
       </div>
 
       <div class="profile-section">
+
         <img :src="profilePhotoUrl || defaultProfilePhoto" alt="Foto de perfil" class="profile-pic" />
         <p class="user-name">{{ fullName }}</p>
       </div>
@@ -16,6 +17,7 @@
       </div>
 
       <div class="scrollable-content">
+
         <div class="card">
           <div class="card-border"></div>
           <div class="card-content">
@@ -27,6 +29,7 @@
             <button class="card-btn" @click="goToPostulaciones">Ver Postulaciones</button>
           </div>
         </div>
+
 
         <div class="card">
           <div class="card-border"></div>
@@ -41,6 +44,7 @@
             <input ref="fileInput" type="file" accept="application/pdf" style="display: none" @change="handleFileChange" />
           </div>
         </div>
+
 
         <div class="card">
           <div class="card-border"></div>
@@ -80,11 +84,7 @@ export default defineComponent({
     const fileInput = ref<HTMLInputElement | null>(null)
     const photoInput = ref<HTMLInputElement | null>(null)
     const cvFileName = ref<string>('')
-    const cvUrl = ref<string>('') 
-    const profilePhotoUrl = ref<string>('') 
-    const defaultProfilePhoto = '@/assets/imagenvacia.png'
 
-    const fullName = ref<string>('Cargando...')
     const email = localStorage.getItem('email') || ''
     const password = localStorage.getItem('password') || ''
 
@@ -107,28 +107,11 @@ export default defineComponent({
       }
     }
 
-    const toBase64 = (file: File): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (error) => reject(error)
-      })
-    }
-
     const handleFileChange = async (event: Event) => {
       const target = event.target as HTMLInputElement
       if (target.files && target.files.length > 0) {
         const file = target.files[0]
         if (file.type !== 'application/pdf') {
-          console.warn('Archivo inválido. Solo se permite PDF.')
-          return
-        }
-
-        const base64 = await toBase64(file)
-        localStorage.setItem('cvBase64', base64)
-        cvFileName.value = file.name
-        cvUrl.value = base64
 
         await uploadCV(file)
       }
@@ -139,26 +122,13 @@ export default defineComponent({
       if (target.files && target.files.length > 0) {
         const file = target.files[0]
         if (!file.type.startsWith('image/')) {
-          console.warn('Archivo inválido. Solo se permiten imágenes.')
-          return
-        }
-
-        const base64 = await toBase64(file)
-        localStorage.setItem('profilePhotoBase64', base64)
-        profilePhotoUrl.value = base64
 
         await uploadProfilePhoto(file)
       }
     }
 
     const abrirCV = () => {
-      const cv = localStorage.getItem('cvBase64')
-      if (cv) {
-        const win = window.open()
-        win?.document.write(
-          `<iframe src="${cv}" width="100%" height="100%" style="border: none;"></iframe>`
-        )
-      } else if (cvUrl.value) {
+
         window.open(cvUrl.value, '_blank')
       }
     }
@@ -175,9 +145,7 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('Error al subir el CV')
-        console.log('CV subido exitosamente')
-      } catch (error) {
-        console.warn('Error al subir el CV:', (error as Error).message)
+
       }
     }
 
@@ -193,36 +161,24 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('Error al subir la imagen')
-        console.log('Imagen de perfil actualizada')
-      } catch (error) {
-        console.warn('Error al subir imagen de perfil:', (error as Error).message)
+
       }
     }
 
     const fetchProfilePhoto = async () => {
       try {
-        const stored = localStorage.getItem('profilePhotoBase64')
-        if (stored) {
-          profilePhotoUrl.value = stored
-          return
-        }
 
         const response = await fetch(`/api/photo?email=${email}`)
         if (!response.ok) return
         const data = await response.json()
         profilePhotoUrl.value = data.imageUrl || ''
       } catch (error) {
-        console.warn('Error al obtener imagen de perfil:', error)
+
       }
     }
 
     const fetchCV = async () => {
       try {
-        const stored = localStorage.getItem('cvBase64')
-        if (stored) {
-          cvUrl.value = stored
-          return
-        }
 
         const response = await fetch(`/api/cv?email=${email}`)
         if (!response.ok) return
@@ -230,7 +186,7 @@ export default defineComponent({
         cvFileName.value = data.fileName || ''
         cvUrl.value = data.cvUrl || ''
       } catch (error) {
-        console.warn('Error al cargar CV:', error)
+
       }
     }
 
@@ -245,10 +201,7 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('No se pudo obtener el nombre')
-        const data = await response.json()
-        fullName.value = `${data.nombre} ${data.apellido}`
-      } catch (error) {
-        console.warn('Error al obtener el nombre:', error)
+
         fullName.value = 'Usuario'
       }
     }
@@ -280,6 +233,7 @@ export default defineComponent({
   },
 })
 </script>
+
 <style scoped>
 .dashboard-container {
   padding: 1rem;

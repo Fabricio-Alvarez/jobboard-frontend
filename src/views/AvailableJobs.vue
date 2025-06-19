@@ -105,6 +105,7 @@ export default defineComponent({
     const toastMessage = ref('')
     const selectedOfferId = ref<number | null>(null)
 
+
     const filtroLocation = ref<string | null>(
       (route.query.location as string) || null
     )
@@ -124,6 +125,7 @@ export default defineComponent({
       }
     }
 
+
     const ofertasFiltradas = computed(() => {
       return ofertas.value.filter((oferta) => {
         const matchLocation = filtroLocation.value
@@ -135,6 +137,7 @@ export default defineComponent({
         return matchLocation && matchCategory
       })
     })
+
 
     watch(
       () => route.query,
@@ -213,6 +216,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 .dashboard-container {
   padding: 1.5rem;
   max-width: 1200px;

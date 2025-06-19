@@ -148,6 +148,7 @@ export default defineComponent({
     const showCategoriaOptions = ref(false)
     const ultimasBusquedas = ref<{ lugar: string | null, categoria: string | null }[]>([])
 
+
     onMounted(() => {
       const storedBusquedas = localStorage.getItem('ultimasBusquedas')
       if (storedBusquedas) {
@@ -190,6 +191,7 @@ export default defineComponent({
       if (ultimasBusquedas.value.length > 3) {
         ultimasBusquedas.value.pop()
       }
+
 
       localStorage.setItem('ultimasBusquedas', JSON.stringify(ultimasBusquedas.value))
 
