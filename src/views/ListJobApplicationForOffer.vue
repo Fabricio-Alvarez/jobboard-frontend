@@ -16,32 +16,34 @@
           No hay postulaciones para esta oferta.
         </div>
 
-        <table v-else class="applications-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Mensaje</th>
-              <th>Estado</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="app in applications" :key="app.id">
-              <td>{{ app.user_id }}</td>
-              <td>{{ app.message }}</td>
-              <td>{{ app.status }}</td>
-              <td>
-                <button
-                  v-if="app.status === 'pendiente'"
-                  @click="approve(app.id)"
-                  class="btn-approve"
-                >
-                  Aprobar
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-else class="table-responsive">
+          <table class="applications-table">
+            <thead>
+              <tr>
+                <th>Nombre Completo</th>
+                <th>Mensaje</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="app in applications" :key="app.id">
+                <td>{{  app.user ? (app.user.first_name + ' ' + app.user.last_name) : app.user_id }}</td>
+                <td>{{ app.message }}</td>
+                <td>{{ app.status }}</td>
+                <td>
+                  <button
+                    v-if="app.status === 'pendiente'"
+                    @click="approve(app.id)"
+                    class="btn-approve"
+                  >
+                    Aprobar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div>
         <div class="navigation-wrapper">
@@ -165,9 +167,21 @@ export default defineComponent({
   color: #7f8c8d;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .applications-table {
   width: 100%;
   border-collapse: collapse;
+}
+
+/* Solo en pantallas pequeñas, la tabla tendrá min-width y scroll */
+@media (max-width: 768px) {
+  .applications-table {
+    min-width: 600px;
+  }
 }
 
 .applications-table th {
